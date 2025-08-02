@@ -1,0 +1,50 @@
+#######################################
+# Syntax Coloring Map for JKBMSInterface Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+JKBMSInterface	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+update	KEYWORD2
+requestData	KEYWORD2
+getVoltage	KEYWORD2
+getCurrent	KEYWORD2
+getSOC	KEYWORD2
+getCycles	KEYWORD2
+getPowerTemp	KEYWORD2
+getBoxTemp	KEYWORD2
+getBatteryTemp	KEYWORD2
+getNumCells	KEYWORD2
+getCellVoltage	KEYWORD2
+getLowestCellVoltage	KEYWORD2
+getHighestCellVoltage	KEYWORD2
+getCellVoltageDelta	KEYWORD2
+getAlarmStatus	KEYWORD2
+getStatusInfo	KEYWORD2
+isChargingEnabled	KEYWORD2
+isDischargingEnabled	KEYWORD2
+isCharging	KEYWORD2
+isDischarging	KEYWORD2
+getSoftwareVersion	KEYWORD2
+getDeviceInfo	KEYWORD2
+isDataValid	KEYWORD2
+setChargeMOS	KEYWORD2
+setDischargeMOS	KEYWORD2
+enableBatteryOperation	KEYWORD2
+disableBatteryOperation	KEYWORD2
+enableChargingOnly	KEYWORD2
+enableDischargingOnly	KEYWORD2
+printSummary	KEYWORD2
+printRawData	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
