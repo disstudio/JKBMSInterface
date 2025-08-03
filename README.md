@@ -7,8 +7,7 @@ An Arduino library for communicating with JK-BMS (Jikong Battery Management Syst
 - **Easy Integration** - Simple API with clean getter methods
 - **Non-blocking** - Asynchronous data processing 
 - **Complete Data Access** - Cell voltages, current, SOC, temperatures, status
-- **MOS Control** - Enable/disable charging and discharging MOSFETs ⚡ **NEW**
-- **Safety Functions** - Built-in battery management helpers ⚡ **NEW**
+- **MOS Control** - Enable/disable charging and discharging
 - **Error Handling** - Safe defaults when data is invalid
 - **Debug Support** - Built-in summary and raw data printing
 - **Protocol Compliant** - Follows JK-BMS communication protocol v2.5
@@ -196,7 +195,6 @@ GND         → GND
 - Implement safety timeouts for emergency situations
 - Monitor temperature and voltage before enabling MOSFETs
 - Test thoroughly in a safe environment before production use
-- The library includes basic safety but cannot replace proper battery management practices
 
 ## Troubleshooting
 
