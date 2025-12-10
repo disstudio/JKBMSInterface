@@ -46,6 +46,7 @@ public:
     // Info getters
     String getSoftwareVersion();
     String getDeviceInfo();
+    uint16_t getProtocolVersion();
     
     // Data validity
     bool isDataValid();
@@ -78,6 +79,7 @@ private:
         String softwareVersion;
         String deviceInfo;
         bool dataValid;
+        uint16_t protocolVersion;
     };
     
     HardwareSerial* _serial;
