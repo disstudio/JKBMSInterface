@@ -35,6 +35,7 @@ void JKBMSInterface::clearData() {
     _bmsData.cycles = 0;
     _bmsData.softwareVersion = "";
     _bmsData.deviceInfo = "";
+    _bmsData.protocolVersion = 1; // default protocol version
     
     for (int i = 0; i < 24; i++) {
         _bmsData.cellVoltages[i] = 0;
@@ -79,9 +80,12 @@ void JKBMSInterface::requestData() {
 void JKBMSInterface::parseRawData(uint8_t* data, int length) {
     _bmsData.dataValid = false;
     _bmsData.numCells = 0;
+    _bmsData.protocolVersion = 1; // default protocol version
     
     // Look for start of actual data (after header)
     int pos = 11; // Skip header: 4E 57 01 09 00 00 00 00 06 00 01
+    
+    uint16_t current = 0xFFFF;
     
     while (pos < length - 4) { // Leave room for checksum
         if (pos >= length) break;
@@ -145,19 +149,7 @@ void JKBMSInterface::parseRawData(uint8_t* data, int length) {
                 
             case 0x84: // Current
                 if (pos + 1 < length) {
-                    uint16_t current = (data[pos] << 8) | data[pos+1]; // Big endian
-                    
-                    if (current == 0) {
-                        _bmsData.current = 0.0f;
-                    } else if (current == 10000) {
-                        _bmsData.current = 0.0f;
-                    } else if (current > 10000) {
-                        _bmsData.current = (current - 10000) * 0.01f; // Discharge (positive)
-                    } else if (current < 10000 && current > 0) {
-                        _bmsData.current = -(10000 - current) * 0.01f; // Charge (negative)  
-                    } else {
-                        _bmsData.current = 0.0f;
-                    }
+                    current = (data[pos] << 8) | data[pos+1]; // Big endian
                     pos += 2;
                 }
                 break;
@@ -234,7 +226,14 @@ void JKBMSInterface::parseRawData(uint8_t* data, int length) {
                 
             case 0x68: // End marker found
                 _bmsData.dataValid = true;
-                return;
+                break;
+                
+            case 0xC0: // Protocol version number
+                if (pos + 1 < length) {
+                    _bmsData.protocolVersion = (data[pos] << 8) | data[pos+1]; // Big endian
+                    pos += 2;
+                }
+                break;
                 
             default:
                 // Skip unknown data types
@@ -244,6 +243,38 @@ void JKBMSInterface::parseRawData(uint8_t* data, int length) {
                     pos += 1;
                 }
                 break;
+        }
+        
+        if (_bmsData.dataValid) {
+            break;
+        }
+    }
+    
+    if (current != 0xFFFF) {
+        // Parse raw current value dependent to protocol version
+        switch (_bmsData.protocolVersion) {
+            case 0:
+                if (current == 0) {
+                    _bmsData.current = 0.0f;
+                } else if (current == 10000) {
+                    _bmsData.current = 0.0f;
+                } else if (current > 10000) {
+                    _bmsData.current = (current - 10000) * 0.01f; // Discharge (positive)
+                } else if (current < 10000 && current > 0) {
+                    _bmsData.current = -(10000 - current) * 0.01f; // Charge (negative)  
+                } else {
+                    _bmsData.current = 0.0f;
+                }
+                break;
+            
+            case 1:
+                if ((current & 0x8000) == 0) {
+                    // Discharge
+                    _bmsData.current = current * 0.01f;
+                } else {
+                    // Charge
+                    _bmsData.current = -(current & 0x07FF) * 0.01f;
+                }
         }
     }
     
@@ -349,6 +380,10 @@ String JKBMSInterface::getSoftwareVersion() {
 
 String JKBMSInterface::getDeviceInfo() {
     return _bmsData.dataValid ? _bmsData.deviceInfo : "Unknown";
+}
+
+uint16_t JKBMSInterface::getProtocolVersion() {
+    return _bmsData.dataValid ? _bmsData.protocolVersion : 0;
 }
 
 bool JKBMSInterface::isDataValid() {
@@ -574,6 +609,11 @@ void JKBMSInterface::printSummary() {
         Serial.print(_bmsData.softwareVersion);
         Serial.println("           ║");
     }
+    
+    
+    Serial.print("║ Protocol version: ");
+    Serial.print(_bmsData.protocolVersion);
+    Serial.println("                   ║");
     
     Serial.println("╚═══════════════════════════════════════╝");
 }
